@@ -97,6 +97,26 @@ header{flex-wrap:wrap}
 .demo{font-size:.8rem;border-top:1px dashed var(--rosa);margin-top:12px;padding-top:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .demo button{border:2px solid var(--cacao);background:transparent;border-radius:999px;padding:4px 12px;cursor:pointer;font-weight:500}
 .perfil{display:grid;gap:12px}
+.banner{position:relative;background:var(--rosa);border-radius:0 0 28px 28px;overflow:hidden}
+.pista{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.pista::-webkit-scrollbar{display:none}
+.slide{flex:0 0 100%;scroll-snap-align:start;position:relative;height:clamp(230px,50vw,440px);overflow:hidden;display:flex;align-items:center}
+.slide .fondo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.slide.marca{padding:8px 16px 28px}
+.slide.marca .hero-in{width:100%}
+/* toque de marca sobre fotos reales: degradado frambuesa, marco punteado crema y sello */
+.slide.foto::before{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(168,15,59,.88) 0%,rgba(212,20,75,.35) 45%,rgba(249,180,203,.12) 100%);z-index:1}
+.slide.foto::after{content:"";position:absolute;inset:10px;border:2px dashed var(--crema);border-radius:20px;z-index:1;pointer-events:none}
+.slide .txt{position:relative;z-index:2;align-self:flex-end;padding:0 28px 44px;color:var(--crema);max-width:36ch}
+.slide .txt h2{color:var(--crema);font-size:clamp(1.6rem,6vw,2.6rem);line-height:1.05;margin:0 0 4px;text-shadow:0 2px 0 var(--frambuesa-osc)}
+.slide .txt p{margin:0;font-weight:500}
+.slide .sello{position:absolute;z-index:2;top:22px;right:22px;width:clamp(64px,16vw,110px);height:auto;transform:rotate(8deg)}
+.flecha{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:38px;height:38px;border-radius:50%;border:2px solid var(--frambuesa);background:var(--crema);color:var(--frambuesa);font-size:1.4rem;line-height:1;cursor:pointer}
+.flecha.izq{left:10px}.flecha.der{right:10px}
+.puntos{position:absolute;z-index:3;left:0;right:0;bottom:12px;display:flex;justify-content:center;gap:8px}
+.puntos button{width:11px;height:11px;border-radius:50%;border:2px solid var(--crema);background:transparent;padding:0;cursor:pointer}
+.puntos button[aria-current="true"]{background:var(--crema)}
+@media (max-width:520px){.flecha{display:none}}
 @media (min-width:860px){
   main{grid-template-columns:1fr 360px;align-items:start;padding-bottom:40px}
   .col-cat{display:grid;gap:18px}
@@ -130,14 +150,11 @@ header{flex-wrap:wrap}
   <div id="lista-pedidos" style="display:grid;gap:16px"></div>
 </section>
 <div id="vista-tienda">
-<section class="hero" id="top">
-  <div class="hero-in">
-    <div>
-      <h1>Dulzura en cada detalle</h1>
-      <p>Postres hechos a mano, entregados a domicilio en el área metropolitana de Guatemala.</p>
-    </div>
-    <img src="img/mascota.png" alt="La chef de Sweetly, un cakesicle con gorro y delantal" width="433" height="520">
-  </div>
+<section class="banner" id="top" aria-roledescription="carrusel" aria-label="Novedades de Sweetly">
+  <div class="pista" id="pista" tabindex="0"></div>
+  <button class="flecha izq" type="button" id="b-ant" aria-label="Anterior">‹</button>
+  <button class="flecha der" type="button" id="b-sig" aria-label="Siguiente">›</button>
+  <div class="puntos" id="puntos"></div>
 </section>
 <main>
   <div class="col-cat">
@@ -173,6 +190,13 @@ const CONFIG = {
   zonas: [ {nombre:"Por definir", envio:null} ],  // una línea por zona. envio: costo en quetzales, o null si falta. Ejemplo: {nombre:"Zona 10", envio:25}
   banco: { banco: "Por definir", tipo: "Por definir", cuenta: "Por definir", nombre: "Por definir" }, // datos para transferencia
 };
+/* Banner rotativo. tipo "video": src del video. tipo "marca": portada con la mascota.
+   tipo "foto": foto real en img/banners/ + titulo y texto; el sitio le pone el degradado, el marco y el sello. */
+const BANNERS = [
+  {tipo:"video", src:"https://stream.mux.com/HdgdDBiE02mRnIEhOsrZr7vPhQdg1peUSJYRvXuJC01L8/highest.mp4", alt:"Animación del logo de Sweetly"},
+  {tipo:"marca"},
+  // {tipo:"foto", src:"img/banners/mini-donas.jpg", titulo:"Mini donas", texto:"Recién glaseadas, por docena."},
+];
 const PASOS = ["Pedido recibido", "Pago confirmado", "En preparación", "En camino", "Entregado"];
 /* precio: número en quetzales, o null si aún no está definido */
 const PRODUCTOS = [
@@ -319,6 +343,36 @@ document.addEventListener("click", e => {
 });
 $("form").addEventListener("input", pintarPedido);
 $("form").addEventListener("submit", e => { e.preventDefault(); confirmarPedido(); });
+
+/* ====== Banner ====== */
+(function(){
+  const pista = $("pista"), puntos = $("puntos"); let i = 0, t = null;
+  const quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  pista.innerHTML = BANNERS.map(b => b.tipo==="video"
+    ? `<div class="slide"><video class="fondo" src="${b.src}" muted playsinline preload="metadata" aria-label="${esc(b.alt||"")}"></video></div>`
+    : b.tipo==="foto"
+    ? `<div class="slide foto"><img class="fondo" src="${b.src}" alt="${esc(b.titulo||"")}"><img class="sello" src="img/sello.png" alt=""><div class="txt"><h2>${esc(b.titulo||"")}</h2><p>${esc(b.texto||"")}</p></div></div>`
+    : `<div class="slide marca"><div class="hero hero-in" style="background:none;padding:0"><div><h1>Dulzura en cada detalle</h1><p>Postres hechos a mano, entregados a domicilio en el área metropolitana de Guatemala.</p></div><img src="img/mascota.png" alt="La chef de Sweetly, un cakesicle con gorro y delantal" width="433" height="520"></div></div>`).join("");
+  puntos.innerHTML = BANNERS.map((b,n) => `<button type="button" data-ir="${n}" aria-label="Ir al banner ${n+1}"></button>`).join("");
+  const slides = [...pista.children];
+  function marcar(){
+    [...puntos.children].forEach((p,n) => p.setAttribute("aria-current", n===i ? "true" : "false"));
+    slides.forEach((s,n) => { const v = s.querySelector("video"); if(!v) return; if(n===i && !quieto){ v.currentTime = 0; v.play().catch(()=>{}); } else v.pause(); });
+  }
+  function programar(){
+    clearTimeout(t); if(quieto || BANNERS.length<2) return;
+    const v = slides[i].querySelector("video");
+    t = setTimeout(() => ir(i+1), v ? 10500 : 6000);
+  }
+  function ir(n){ i = (n + BANNERS.length) % BANNERS.length; pista.scrollTo({left: i*pista.clientWidth, behavior: quieto ? "auto" : "smooth"}); marcar(); programar(); }
+  pista.addEventListener("scroll", () => { const n = Math.round(pista.scrollLeft / pista.clientWidth); if(n!==i){ i = n; marcar(); programar(); } });
+  puntos.addEventListener("click", e => { const b = e.target.closest("[data-ir]"); if(b) ir(+b.dataset.ir); });
+  $("b-ant").addEventListener("click", () => ir(i-1));
+  $("b-sig").addEventListener("click", () => ir(i+1));
+  pista.addEventListener("pointerenter", () => clearTimeout(t));
+  pista.addEventListener("pointerleave", programar);
+  marcar(); programar();
+})();
 
 $("aviso").textContent = CONFIG.aviso;
 $("f-zona").innerHTML = CONFIG.zonas.map((z,i) => `<option value="${i}">${esc(z.nombre)}${z.envio==null?"":" · envío "+Q(z.envio)}</option>`).join("");
