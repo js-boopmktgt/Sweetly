@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es-GT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sweetly Tienda</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Shrikhand&display=swap" rel="stylesheet">
+<style>
+/* Layout: una columna en celular, cuadrícula de tarjetas que crece; carrito fijo abajo en celular y a la derecha en pantallas anchas. Tema único de marca. */
+:root{
+  color-scheme: light;
+  --rosa:#F9B4CB;
+  --rosa-claro:#FCD9E4;
+  --frambuesa:#D4144B;
+  --frambuesa-osc:#A80F3B;
+  --crema:#FFF5E4;
+  --cacao:#5A2E2A;
+  --display:"Shrikhand","Cooper Black",Georgia,serif;
+  --body:"Poppins",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:18px;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--crema);color:var(--cacao);font-family:var(--body);font-size:16px;line-height:1.5}
+a{color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--cacao);outline-offset:2px}
+.aviso{background:var(--frambuesa);color:var(--crema);text-align:center;font-size:.85rem;font-weight:500;padding:8px 16px}
+header{background:var(--rosa);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:5}
+.marca{display:flex;align-items:center;gap:10px;text-decoration:none}
+.marca img{height:54px;width:auto;display:block}
+.marca b{font-family:var(--display);font-weight:400;font-size:1.9rem;color:var(--crema);line-height:1;text-shadow:0 2px 0 var(--frambuesa)}
+.btn-carrito{background:var(--crema);border:2px solid var(--frambuesa);color:var(--frambuesa);border-radius:999px;padding:8px 16px;font-weight:600;cursor:pointer;white-space:nowrap}
+.btn-carrito span{background:var(--frambuesa);color:var(--crema);border-radius:999px;padding:1px 8px;margin-left:6px;font-size:.85rem}
+.hero{background:var(--rosa);padding:8px 16px 28px;border-radius:0 0 28px 28px}
+.hero h1{font-family:var(--display);font-weight:400;color:var(--frambuesa);font-size:clamp(1.7rem,7vw,2.6rem);line-height:1.1;margin:0 0 6px;text-wrap:balance}
+.hero p{margin:0;max-width:46ch;font-weight:500}
+.hero-in{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.hero-in img{height:clamp(120px,32vw,220px);width:auto;flex:none}
+main{max-width:1100px;margin:0 auto;padding:20px 16px 120px;display:grid;gap:24px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.chip{flex:none;border:2px solid var(--frambuesa);background:transparent;color:var(--frambuesa);border-radius:999px;padding:6px 14px;font-weight:500;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--frambuesa);color:var(--crema)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.card{background:#fff;border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;border:1px solid var(--rosa-claro)}
+.card .img{background:var(--rosa-claro);aspect-ratio:4/3;display:grid;place-items:center}
+.card .img svg{width:56%;height:auto}
+.card .info{padding:12px;display:flex;flex-direction:column;gap:6px;flex:1}
+.card small{color:var(--frambuesa);font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em}
+.card h3{margin:0;font-size:1rem;font-weight:600;line-height:1.25}
+.precio{font-weight:600;font-variant-numeric:tabular-nums}
+.precio.pend{font-weight:500;font-size:.82rem;color:var(--frambuesa-osc)}
+.card button{margin-top:auto;background:var(--frambuesa);color:var(--crema);border:0;border-radius:999px;padding:9px 12px;font-weight:600;cursor:pointer}
+.card button:hover{background:var(--frambuesa-osc)}
+h2{font-family:var(--display);font-weight:400;color:var(--frambuesa);font-size:1.6rem;margin:0 0 10px}
+.panel{background:#fff;border:1px solid var(--rosa-claro);border-radius:var(--r);padding:16px}
+.linea{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--rosa)}
+.linea .n{flex:1;font-weight:500;line-height:1.25}
+.cant{display:flex;align-items:center;gap:6px}
+.cant button{width:30px;height:30px;border-radius:50%;border:2px solid var(--frambuesa);background:var(--crema);color:var(--frambuesa);font-weight:600;cursor:pointer;line-height:1}
+.total{display:flex;justify-content:space-between;font-weight:600;padding-top:12px;font-variant-numeric:tabular-nums}
+.vacio{margin:0;color:var(--frambuesa-osc)}
+form{display:grid;gap:12px;margin-top:16px}
+label{display:grid;gap:4px;font-weight:500;font-size:.9rem}
+input,select,textarea{border:2px solid var(--rosa);border-radius:12px;padding:10px 12px;background:var(--crema);width:100%}
+.enviar{display:block;text-align:center;text-decoration:none;background:var(--frambuesa);color:var(--crema);border:0;border-radius:999px;padding:14px;font-weight:600;font-size:1.05rem;cursor:pointer;width:100%}
+.enviar[aria-disabled="true"]{opacity:.5;pointer-events:none}
+.nota{font-size:.82rem;margin:0}
+.chef{margin:0;background:var(--rosa-claro);border-left:4px solid var(--frambuesa);border-radius:0 12px 12px 0;padding:10px 12px;font-size:.88rem;font-weight:500}
+.msg{font-size:.9rem;font-weight:500;color:var(--frambuesa-osc);min-height:1.4em;margin:0}
+footer{background:var(--frambuesa);color:var(--crema);text-align:center;padding:22px 16px;font-size:.9rem}
+footer img{width:130px;height:auto;display:block;margin:0 auto 10px}
+header{flex-wrap:wrap}
+.nav{display:flex;gap:8px;align-items:center;margin-left:auto}
+@media (max-width:480px){.solo-ancho{display:none}}
+.nav a{text-decoration:none}
+.link-nav{font-weight:600;color:var(--frambuesa-osc);padding:8px 6px;white-space:nowrap}
+#vista-pedidos{max-width:760px;margin:0 auto;padding:20px 16px 80px;display:grid;gap:18px}
+[hidden]{display:none!important}
+.pasos{list-style:none;margin:12px 0 4px;padding:0;display:grid;gap:0}
+.pasos li{display:flex;gap:12px;align-items:flex-start;padding-bottom:14px;position:relative;color:#9a7f7c}
+.pasos li::before{content:"";flex:none;width:18px;height:18px;border-radius:50%;border:3px solid var(--rosa);background:#fff;margin-top:2px}
+.pasos li:not(:last-child)::after{content:"";position:absolute;left:8px;top:22px;bottom:0;width:3px;background:var(--rosa-claro)}
+.pasos li.hecho{color:var(--cacao);font-weight:500}
+.pasos li.hecho::before{background:var(--frambuesa);border-color:var(--frambuesa)}
+.pasos li.actual{color:var(--frambuesa);font-weight:600}
+.pasos li.actual::before{border-color:var(--frambuesa)}
+.cab-ped{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
+.cab-ped b{font-size:1.05rem}
+.pill{display:inline-block;background:var(--rosa-claro);color:var(--frambuesa-osc);border-radius:999px;padding:3px 12px;font-size:.8rem;font-weight:600}
+.banco{background:var(--crema);border:2px dashed var(--rosa);border-radius:12px;padding:12px;margin:10px 0;display:grid;gap:2px;font-size:.92rem}
+.banco dt{font-weight:600;float:left;margin-right:6px}
+.banco dd{margin:0 0 2px}
+.detalle{margin:8px 0;padding:0;list-style:none;font-size:.92rem}
+.detalle li{display:flex;justify-content:space-between;gap:10px;padding:3px 0;font-variant-numeric:tabular-nums}
+.demo{font-size:.8rem;border-top:1px dashed var(--rosa);margin-top:12px;padding-top:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.demo button{border:2px solid var(--cacao);background:transparent;border-radius:999px;padding:4px 12px;cursor:pointer;font-weight:500}
+.perfil{display:grid;gap:12px}
+@media (min-width:860px){
+  main{grid-template-columns:1fr 360px;align-items:start;padding-bottom:40px}
+  .col-cat{display:grid;gap:18px}
+  #pedido{position:sticky;top:84px}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+}
+@media (prefers-reduced-motion:no-preference){.card button,.chip{transition:background .15s}}
+</style>
+</head>
+<body>
+<div class="aviso" id="aviso"></div>
+<header>
+  <a class="marca" href="#tienda"><img src="img/logo.png" alt="Sweetly, dulzura en cada detalle" width="328" height="132"></a>
+  <nav class="nav" aria-label="Principal">
+    <a class="link-nav solo-ancho" href="#tienda">Tienda</a>
+    <a class="link-nav" href="#mis-pedidos">Mi cuenta</a>
+    <a class="btn-carrito" href="#tienda" id="ir-carrito">Carrito<span id="cuenta">0</span></a>
+  </nav>
+</header>
+<section id="vista-pedidos" hidden>
+  <h2>Mi cuenta</h2>
+  <div class="panel">
+    <form class="perfil" id="perfil">
+      <label for="p-nombre">Nombre<input id="p-nombre" autocomplete="name"></label>
+      <label for="p-tel">Teléfono<input id="p-tel" inputmode="tel" autocomplete="tel"></label>
+      <label for="p-dir">Dirección de entrega<textarea id="p-dir" rows="2" autocomplete="street-address"></textarea></label>
+      <p class="msg" id="p-msg" role="status"></p>
+    </form>
+  </div>
+  <h2>Mis pedidos</h2>
+  <div id="lista-pedidos" style="display:grid;gap:16px"></div>
+</section>
+<div id="vista-tienda">
+<section class="hero" id="top">
+  <div class="hero-in">
+    <div>
+      <h1>Dulzura en cada detalle</h1>
+      <p>Postres hechos a mano, entregados a domicilio en el área metropolitana de Guatemala.</p>
+    </div>
+    <img src="img/mascota.png" alt="La chef de Sweetly, un cakesicle con gorro y delantal" width="433" height="520">
+  </div>
+</section>
+<main>
+  <div class="col-cat">
+    <div class="chips" id="chips" role="group" aria-label="Categorías"></div>
+    <div class="grid" id="grid"></div>
+  </div>
+  <section class="panel" id="pedido" aria-labelledby="t-pedido">
+    <h2 id="t-pedido">Mi pedido</h2>
+    <div id="lineas"></div>
+    <form id="form">
+      <label for="f-nombre">Nombre<input id="f-nombre" autocomplete="name" required></label>
+      <label for="f-zona">Zona de entrega<select id="f-zona"></select></label>
+      <p class="chef" id="nota-envio"></p>
+      <label for="f-dir">Dirección<textarea id="f-dir" rows="2" autocomplete="street-address"></textarea></label>
+      <label for="f-pago">Forma de pago<select id="f-pago">
+        <option>Transferencia bancaria</option>
+        <option>Tarjeta (te enviamos un enlace de pago)</option>
+      </select></label>
+      <button class="enviar" type="submit" id="confirmar">Confirmar pedido</button>
+      <p class="msg" id="msg" role="status"></p>
+      <p class="nota">Al confirmar verás los datos para pagar y el avance de tu pedido en Mi cuenta.</p>
+    </form>
+  </section>
+</main>
+</div>
+<footer><img src="img/sello.png" alt="Sello de Sweetly" width="358" height="360">Postres a domicilio · Guatemala</footer>
+
+<script>
+/* ====== CONFIGURACIÓN: lo único que hay que editar ====== */
+const CONFIG = {
+  whatsapp: "",            // número con código de país, sin signos. Ejemplo: "50212345678"
+  aviso: "El envío va aparte y depende de tu zona. Te lo digo antes de pagar.",  // franja superior
+  zonas: [ {nombre:"Por definir", envio:null} ],  // una línea por zona. envio: costo en quetzales, o null si falta. Ejemplo: {nombre:"Zona 10", envio:25}
+  banco: { banco: "Por definir", tipo: "Por definir", cuenta: "Por definir", nombre: "Por definir" }, // datos para transferencia
+};
+const PASOS = ["Pedido recibido", "Pago confirmado", "En preparación", "En camino", "Entregado"];
+/* precio: número en quetzales, o null si aún no está definido */
+const PRODUCTOS = [
+  {id:"ck-limon", cat:"Cheesecakes", nombre:"Cheesecake de limón", precio:null},
+  {id:"ck-cafe",  cat:"Cheesecakes", nombre:"Cheesecake de café", precio:null},
+  {id:"ck-oreo",  cat:"Cheesecakes", nombre:"Cheesecake de Oreo", precio:null},
+  {id:"ck-fresa", cat:"Cheesecakes", nombre:"Cheesecake de fresa", precio:null},
+  {id:"cc-tres",  cat:"Cup cakes", nombre:"Cup cake tres leches", precio:null},
+  {id:"cc-choco", cat:"Cup cakes", nombre:"Cup cake doble chocolate", precio:null},
+  {id:"cc-flan",  cat:"Cup cakes", nombre:"Cup cake de flan", precio:null},
+  {id:"gal-nut",  cat:"Cookies", nombre:"Galleta artesanal rellena de Nutella", precio:null},
+  {id:"smores",   cat:"S'mores", nombre:"S'mores", precio:null},
+  {id:"donas",    cat:"Mini donas", nombre:"Mini donas", precio:null},
+];
+/* ======================================================== */
+
+const S='stroke="#D4144B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"';
+const ICONOS = {
+  "Cheesecakes": `<svg viewBox="0 0 80 60"><path d="M8 40 60 14l12 26z" fill="#FFF5E4" ${S}/><path d="M8 40h64v10H8z" fill="#F8AFC8" ${S}/><circle cx="58" cy="12" r="5" fill="#D4144B"/></svg>`,
+  "Cup cakes": `<svg viewBox="0 0 80 60"><path d="M22 28h36l-5 26H27z" fill="#F8AFC8" ${S}/><path d="M18 28c0-12 10-20 22-20s22 8 22 20z" fill="#FFF5E4" ${S}/><circle cx="40" cy="8" r="4" fill="#D4144B"/></svg>`,
+  "Cookies": `<svg viewBox="0 0 80 60"><circle cx="40" cy="30" r="24" fill="#FFF5E4" ${S}/><circle cx="32" cy="22" r="3.5" fill="#5A2E2A"/><circle cx="48" cy="26" r="3.5" fill="#5A2E2A"/><circle cx="36" cy="38" r="3.5" fill="#5A2E2A"/><circle cx="50" cy="40" r="3" fill="#5A2E2A"/></svg>`,
+  "S'mores": `<svg viewBox="0 0 80 60"><rect x="14" y="10" width="52" height="10" rx="3" fill="#FFF5E4" ${S}/><rect x="18" y="20" width="44" height="10" rx="5" fill="#fff" ${S}/><rect x="16" y="30" width="48" height="8" rx="2" fill="#5A2E2A"/><rect x="14" y="38" width="52" height="10" rx="3" fill="#FFF5E4" ${S}/></svg>`,
+  "Mini donas": `<svg viewBox="0 0 80 60"><circle cx="40" cy="30" r="24" fill="#F8AFC8" ${S}/><circle cx="40" cy="30" r="8" fill="#FCD9E4" ${S}/><path d="M26 20l4 3M52 18l-3 4M56 34l-5-1M30 44l3-4M48 46l-2-5" ${S}/></svg>`,
+};
+
+const $ = id => document.getElementById(id);
+const Q = n => "Q" + n.toFixed(2);
+let carrito = {};
+try { carrito = JSON.parse(localStorage.getItem("sweetly-carrito") || "{}"); } catch(e) {}
+let filtro = "Todo";
+
+function guardar(){ try { localStorage.setItem("sweetly-carrito", JSON.stringify(carrito)); } catch(e) {} }
+
+function pintarChips(){
+  const cats = ["Todo", ...new Set(PRODUCTOS.map(p => p.cat))];
+  $("chips").innerHTML = cats.map(c => `<button class="chip" type="button" aria-pressed="${c===filtro}" data-cat="${c}">${c}</button>`).join("");
+}
+function pintarGrid(){
+  const lista = PRODUCTOS.filter(p => filtro==="Todo" || p.cat===filtro);
+  $("grid").innerHTML = lista.map(p => `
+    <article class="card">
+      <div class="img">${ICONOS[p.cat] || ""}</div>
+      <div class="info">
+        <small>${p.cat}</small>
+        <h3>${p.nombre}</h3>
+        <div class="precio ${p.precio==null?"pend":""}">${p.precio==null?"Precio por confirmar":Q(p.precio)}</div>
+        <button type="button" data-add="${p.id}">Agregar</button>
+      </div>
+    </article>`).join("");
+}
+function resumen(){
+  const items = Object.entries(carrito).map(([id,c]) => ({p:PRODUCTOS.find(x=>x.id===id), c})).filter(x=>x.p && x.c>0);
+  const pend = items.some(x => x.p.precio==null);
+  const sub = items.reduce((s,x) => s + (x.p.precio||0)*x.c, 0);
+  const zona = CONFIG.zonas[+$("f-zona").value] || CONFIG.zonas[0];
+  const envioPend = zona.envio==null;
+  const total = sub + (zona.envio||0);
+  return {items, pend, sub, zona, envioPend, total, totalPend: pend||envioPend};
+}
+function textoPedido(){
+  const {items,pend,sub,zona,envioPend,total,totalPend} = resumen();
+  const l = ["Hola Sweetly, quiero hacer este pedido:", ""];
+  items.forEach(x => l.push(`- ${x.c} x ${x.p.nombre}${x.p.precio!=null?" ("+Q(x.p.precio*x.c)+")":""}`));
+  l.push("", "Postres: "+(pend?"por confirmar":Q(sub)), "Envío a "+zona.nombre+": "+(envioPend?"por confirmar":Q(zona.envio)), "Total a pagar: "+(totalPend?"por confirmar":Q(total)));
+  l.push("Nombre: "+($("f-nombre").value||"-"), "Zona: "+zona.nombre, "Dirección: "+($("f-dir").value||"-"), "Pago: "+$("f-pago").value);
+  return l.join("\n");
+}
+function pintarPedido(){
+  const {items,pend,sub,zona,envioPend,total,totalPend} = resumen();
+  $("nota-envio").textContent = envioPend
+    ? "De mi cocina a tu puerta: el envío va aparte del precio de tus postres y cambia según tu zona. Te confirmo el monto por WhatsApp antes de que pagues. Aquí no hay sorpresas."
+    : "De mi cocina a tu puerta: el envío a "+zona.nombre+" son "+Q(zona.envio)+", aparte del precio de tus postres. Ya va sumado en tu total. Aquí no hay sorpresas.";
+  $("cuenta").textContent = items.reduce((s,x)=>s+x.c,0);
+  $("lineas").innerHTML = items.length ? items.map(x => `
+    <div class="linea"><span class="n">${x.p.nombre}</span>
+      <span class="cant"><button type="button" data-menos="${x.p.id}" aria-label="Quitar uno">−</button><b>${x.c}</b><button type="button" data-add="${x.p.id}" aria-label="Agregar uno">+</button></span>
+    </div>`).join("") + `<ul class="detalle" style="margin-top:10px"><li><span>Postres</span><span>${pend?"Por confirmar":Q(sub)}</span></li><li><span>Envío a ${esc(zona.nombre)}</span><span>${envioPend?"Por confirmar":Q(zona.envio)}</span></li></ul><div class="total" style="border-top:1px dashed var(--rosa)"><span>Total a pagar</span><span>${totalPend?"Por confirmar":Q(total)}</span></div>`
+    : `<p class="vacio">Tu pedido está vacío. Agrega un postre para empezar.</p>`;
+}
+
+/* ====== Cuenta del cliente: perfil y pedidos (en este prototipo se guardan en este navegador) ====== */
+let pedidos = [], perfil = {};
+try { pedidos = JSON.parse(localStorage.getItem("sweetly-pedidos-v2") || "[]"); perfil = JSON.parse(localStorage.getItem("sweetly-perfil") || "{}"); } catch(e) {}
+function guardarCuenta(){ try { localStorage.setItem("sweetly-pedidos-v2", JSON.stringify(pedidos)); localStorage.setItem("sweetly-perfil", JSON.stringify(perfil)); } catch(e) {} }
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function textoComprobante(o){
+  return ["Hola Sweetly, envío el comprobante de mi pedido "+o.id+".", "Nombre: "+o.nombre, "Total: "+(o.pend?"por confirmar":Q(o.total)), "Forma de pago: "+o.pago].join("\n");
+}
+function pintarPedidos(){
+  $("p-nombre").value = perfil.nombre||""; $("p-tel").value = perfil.tel||""; $("p-dir").value = perfil.dir||"";
+  if(!pedidos.length){ $("lista-pedidos").innerHTML = `<div class="panel" style="text-align:center"><img src="img/mascota.png" alt="" width="433" height="520" style="height:110px;width:auto"><p class="vacio">Aún no tienes pedidos. Cuando confirmes uno, aquí verás su detalle, cómo pagarlo y su avance.</p></div>`; return; }
+  $("lista-pedidos").innerHTML = pedidos.map((o,i) => {
+    const transf = o.pago.startsWith("Transferencia"), b = CONFIG.banco;
+    const wa = CONFIG.whatsapp ? `<a class="enviar" target="_blank" rel="noopener" href="https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(o.texto+"\n\n"+textoComprobante(o))}">${transf?"Enviar comprobante por WhatsApp":"Escribir por WhatsApp sobre este pedido"}</a>` : `<p class="msg">Falta configurar el número de WhatsApp de pedidos.</p>`;
+    const pago = o.estado>=1 ? `<p><span class="pill">Pago confirmado</span></p>` : transf ? `
+      <p style="margin:10px 0 0;font-weight:600">Paga por transferencia</p>
+      <dl class="banco"><dt>Banco:</dt><dd>${esc(b.banco)}</dd><dt>Tipo de cuenta:</dt><dd>${esc(b.tipo)}</dd><dt>Número de cuenta:</dt><dd>${esc(b.cuenta)}</dd><dt>A nombre de:</dt><dd>${esc(b.nombre)}</dd><dt>Monto:</dt><dd>${o.pend?"Te lo confirmo por WhatsApp, con el envío de tu zona incluido":Q(o.total)+", con el envío ya incluido"}</dd></dl>
+      <p class="chef">Transfiere el total exacto y mándame la foto del comprobante. En cuanto lo vea, enciendo el horno: sin pago confirmado no empiezo a preparar.</p>${wa}`
+      : `<p class="nota" style="margin-top:10px">${o.pago.startsWith("Tarjeta")?"Te enviaremos por WhatsApp un enlace para pagar con tarjeta.":"Te escribo por WhatsApp para coordinar tu pago."}</p>${wa}`;
+    return `<article class="panel">
+      <div class="cab-ped"><b>Pedido ${o.id}</b><span class="pill">${PASOS[o.estado]}</span></div>
+      <p class="nota">${esc(o.fecha)} · ${esc(o.zona)} · ${esc(o.pago)}</p>
+      <ul class="detalle">${o.items.map(x=>`<li><span>${x.c} x ${esc(x.nombre)}</span><span>${x.precio==null?"":Q(x.precio*x.c)}</span></li>`).join("")}
+        <li style="border-top:1px dashed var(--rosa);margin-top:4px;padding-top:6px"><span>Postres</span><span>${o.subPend?"Por confirmar":Q(o.sub)}</span></li><li><span>Envío a ${esc(o.zona)}</span><span>${o.envio==null?"Por confirmar":Q(o.envio)}</span></li><li style="font-weight:600"><span>Total a pagar</span><span>${o.pend?"Por confirmar":Q(o.total)}</span></li></ul>
+      <ol class="pasos">${PASOS.map((p,n)=>`<li class="${n<o.estado?"hecho":n===o.estado?"actual":""}">${p}</li>`).join("")}</ol>
+      ${pago}
+    </article>`; }).join("");
+}
+function confirmarPedido(){
+  const {items,pend,sub,zona,envioPend,total,totalPend} = resumen();
+  if(!items.length){ $("msg").textContent = "Agrega al menos un postre antes de confirmar."; return; }
+  if(!$("f-nombre").value.trim()){ $("msg").textContent = "Escribe tu nombre para confirmar el pedido."; $("f-nombre").focus(); return; }
+  const o = { id:"SW-"+String(Date.now()).slice(-6), fecha:new Date().toLocaleDateString("es-GT",{day:"numeric",month:"long",year:"numeric"}),
+    items:items.map(x=>({nombre:x.p.nombre,c:x.c,precio:x.p.precio})), pend:totalPend, subPend:pend, sub, envio:zona.envio, total, nombre:$("f-nombre").value.trim(), zona:zona.nombre,
+    dir:$("f-dir").value.trim(), pago:$("f-pago").value, estado:0, texto:textoPedido() };
+  pedidos.unshift(o);
+  perfil.nombre = perfil.nombre || o.nombre; perfil.dir = perfil.dir || o.dir;
+  carrito = {}; guardar(); guardarCuenta(); pintarPedido();
+  location.hash = "mis-pedidos"; mostrarVista();
+}
+function mostrarVista(){
+  const cuenta = location.hash === "#mis-pedidos";
+  $("vista-pedidos").hidden = !cuenta; $("vista-tienda").hidden = cuenta;
+  if(cuenta){ pintarPedidos(); window.scrollTo(0,0); }
+}
+window.addEventListener("hashchange", mostrarVista);
+$("ir-carrito").addEventListener("click", () => setTimeout(() => $("pedido").scrollIntoView({block:"start"}), 50));
+$("perfil").addEventListener("input", () => { perfil = {nombre:$("p-nombre").value, tel:$("p-tel").value, dir:$("p-dir").value}; guardarCuenta(); $("p-msg").textContent = "Datos guardados en este dispositivo."; });
+$("perfil").addEventListener("submit", e => e.preventDefault());
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-avanzar]"); if(!t) return;
+  const o = pedidos[+t.dataset.avanzar]; o.estado = (o.estado+1) % PASOS.length; guardarCuenta(); pintarPedidos();
+});
+
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-add],[data-menos],[data-cat]");
+  if(!t) return;
+  if(t.dataset.cat){ filtro = t.dataset.cat; pintarChips(); pintarGrid(); return; }
+  const id = t.dataset.add || t.dataset.menos;
+  carrito[id] = Math.max(0, (carrito[id]||0) + (t.dataset.add ? 1 : -1));
+  if(!carrito[id]) delete carrito[id];
+  guardar(); pintarPedido();
+});
+$("form").addEventListener("input", pintarPedido);
+$("form").addEventListener("submit", e => { e.preventDefault(); confirmarPedido(); });
+
+$("aviso").textContent = CONFIG.aviso;
+$("f-zona").innerHTML = CONFIG.zonas.map((z,i) => `<option value="${i}">${esc(z.nombre)}${z.envio==null?"":" · envío "+Q(z.envio)}</option>`).join("");
+$("f-nombre").value = perfil.nombre||""; $("f-dir").value = perfil.dir||"";
+pintarChips(); pintarGrid(); pintarPedido(); mostrarVista();
+</script>
+</body>
+</html>
