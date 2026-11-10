@@ -104,6 +104,11 @@ header{flex-wrap:wrap}
 .slide .fondo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .slide.marca{padding:8px 16px 28px}
 .slide.marca .hero-in{width:100%}
+.slide.marca p{font-size:clamp(.82rem,2.6vw,1rem)}
+.envio-b{margin-top:6px!important;font-weight:600!important;color:var(--frambuesa-osc)}
+.ver-cat{display:inline-block;margin-top:10px;background:var(--frambuesa);color:var(--crema);text-decoration:none;font-weight:600;border-radius:999px;padding:8px 18px}
+.slide.marca h1{font-size:clamp(1.4rem,6vw,2.6rem)}
+.slide{height:clamp(270px,56vw,440px)}
 /* toque de marca sobre fotos reales: degradado frambuesa, marco punteado crema y sello */
 .slide.foto::before{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(168,15,59,.88) 0%,rgba(212,20,75,.35) 45%,rgba(249,180,203,.12) 100%);z-index:1}
 .slide.foto::after{content:"";position:absolute;inset:10px;border:2px dashed var(--crema);border-radius:20px;z-index:1;pointer-events:none}
@@ -352,7 +357,7 @@ $("form").addEventListener("submit", e => { e.preventDefault(); confirmarPedido(
     ? `<div class="slide"><video class="fondo" src="${b.src}" muted playsinline preload="metadata" aria-label="${esc(b.alt||"")}"></video></div>`
     : b.tipo==="foto"
     ? `<div class="slide foto"><img class="fondo" src="${b.src}" alt="${esc(b.titulo||"")}"><img class="sello" src="img/sello.png" alt=""><div class="txt"><h2>${esc(b.titulo||"")}</h2><p>${esc(b.texto||"")}</p></div></div>`
-    : `<div class="slide marca"><div class="hero hero-in" style="background:none;padding:0"><div><h1>Dulzura en cada detalle</h1><p>Postres hechos a mano, entregados a domicilio en el área metropolitana de Guatemala.</p></div><img src="img/mascota.png" alt="La chef de Sweetly, un cakesicle con gorro y delantal" width="433" height="520"></div></div>`).join("");
+    : `<div class="slide marca"><div class="hero hero-in" style="background:none;padding:0"><div><h1>Dulzura en cada detalle</h1><p>Postres personalizados y generales, hechos artesanalmente para toda ocasión. Ve nuestro catálogo: listos para entregar a domicilio en Ciudad de Guatemala.</p><p class="envio-b">El envío es adicional y depende de tu zona.</p><a class="ver-cat" href="#chips">Ver catálogo</a></div><img src="img/mascota.png" alt="La chef de Sweetly, un cakesicle con gorro y delantal" width="433" height="520"></div></div>`).join("");
   puntos.innerHTML = BANNERS.map((b,n) => `<button type="button" data-ir="${n}" aria-label="Ir al banner ${n+1}"></button>`).join("");
   const slides = [...pista.children];
   function marcar(){
